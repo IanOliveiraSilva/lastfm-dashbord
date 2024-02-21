@@ -2,10 +2,19 @@ import dash
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
+
 import plotly.graph_objs as go
 import requests
 import os
 from dotenv import load_dotenv
+from PIL import Image
+import numpy as np
+import urllib.request
+
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib.patheffects as path_effects
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -18,17 +27,19 @@ class LastFmDashboard:
     def layout(self):
         return html.Div([
             html.H1(
-                'Last.fm Dashboard', 
+                'Last.fm Collage', 
                 style={
                     'textAlign': 'center', 
                     'padding': '20px', 
                     'fontWeight':'bold',
-                    'backgroundColor': '#0CF25D', 
+                    'backgroundColor': '#a16dfe', 
                     'color': 'white', 
+                    'textShadow': '1px 1px 10px #000000',
                     'borderRadius': '15px', 
                     'boxShadow': '0px 0px 10px 3px rgba(2, 115, 94, 0.2)'
                 }
             ),
+
             dcc.Input(
                 id='user-input', 
                 type='text', 
@@ -39,9 +50,9 @@ class LastFmDashboard:
                     'fontSize': '20px',
                     'padding': '10px',
                     'borderRadius': '15px',
-                    'border': '2px solid #02735E',
+                    'border': '1px solid #7a4bd8',
                     'outline': 'none',
-                    'boxShadow': '0px 0px 15px 4px rgba(2, 115, 94, 0.2)'
+                    'boxShadow': '0px 0px 5px 1px #5229b1'
                 }
             ),
             html.Br(),
@@ -61,7 +72,7 @@ class LastFmDashboard:
                     'width': '100%', 
                     'fontSize': '20px',
                     'borderRadius': '15px',
-                    'border': '1px solid #02735E',
+                    'border': '1px solid #5229b1',
                 }
             ),
             html.Br(),
@@ -70,7 +81,7 @@ class LastFmDashboard:
                 id='submit-button', 
                 style={
                     'width': '100%', 
-                    'backgroundColor': '#0CF25D', 
+                    'backgroundColor': '#a16dfe', 
                     'fontSize': '20px', 
                     'color': 'white', 
                     'border': 'none', 
@@ -83,31 +94,27 @@ class LastFmDashboard:
                 }
             ),
             html.Div(id='top-albums-graph', style={
-                'border': '2px solid #0CF25D', 
+                'border': '2px solid #663ac4', 
                 'padding': '20px', 
                 'margin': '20px', 
                 'fontSize': '15px',
                 'borderRadius': '15px',
-                'boxShadow': '0px 0px 10px 3px rgba(2, 115, 94, 0.2)'
             }),
             html.Div(id='top-artists-graph', style={
-                'border': '2px solid #0CF25D', 
+                'border': '2px solid #7a4bd8', 
                 'padding': '20px', 
                 'margin': '20px', 
                 'fontSize': '15px',
                 'borderRadius': '15px',
-                'boxShadow': '0px 0px 10px 3px rgba(2, 115, 94, 0.2)'
             }),
             html.Div(id='top-tracks-graph', style={
-                'border': '2px solid #0CF25D', 
+                'border': '2px solid #663ac4', 
                 'padding': '20px', 
                 'margin': '20px', 
                 'fontSize': '15px',
                 'borderRadius': '15px',
-                'boxShadow': '0px 0px 10px 3px rgba(2, 115, 94, 0.2)'
-            })
+            }),
         ], style={'width': '100%', 'margin': 'auto'})
-
 
     def get_json_data(self, method, user, period):
         url = f"http://ws.audioscrobbler.com/2.0/?method={method}&user={user}&api_key={self.api_key}&period={period}&format=json"
@@ -122,7 +129,7 @@ class LastFmDashboard:
             names.append(item["name"])
             playcounts.append(int(item["playcount"]))
 
-        return go.Bar(x=names, y=playcounts, marker_color='rgb(0,168,255)')
+        return go.Bar(x=names, y=playcounts, marker_color='rgb(82,41,177)')
 
     def run(self):
         @self.app.callback(
@@ -145,16 +152,16 @@ class LastFmDashboard:
                     dcc.Graph(figure={'data': [self.plot_data(data_artists, 'artist')], 
                     'layout': go.Layout(title=f'Top Played Artists from {user} ({period})', yaxis=dict(title='Playcount'), autosize=True, height=600, xaxis_tickangle=-45)}),
                     dcc.Graph(figure={'data': [self.plot_data(data_tracks, 'track')], 
-                    'layout': go.Layout(title=f'Top Played Tracks from {user} ({period})', yaxis=dict(title='Playcount'), autosize=True, height=600, xaxis_tickangle=-45)})
+                    'layout': go.Layout(title=f'Top Played Tracks from {user} ({period})', yaxis=dict(title='Playcount'), autosize=True, height=600, xaxis_tickangle=-45)}),
+                    
                 )
-
 
 if __name__ == "__main__":
     load_dotenv()
     api_key = os.getenv("API_KEY")
     dashboard = LastFmDashboard(api_key)
     dashboard.run()
-    dashboard.app.run_server(debug=True, host='0.0.0.0', port=os.getenv('PORT', 8050))
+    dashboard.app.run_server(debug=True, host='localhost', port=os.getenv('PORT', 8050))
 
 
 
