@@ -16,7 +16,9 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.patheffects as path_effects
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',
+                        'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css',
+                        'https://use.fontawesome.com/releases/v5.8.1/css/all.css']
 
 class LastFmDashboard:
     def __init__(self, api_key):
@@ -36,7 +38,8 @@ class LastFmDashboard:
                     'borderRadius': '15px', 
                 }
             ),
-
+            html.Div(
+            children=[
             dcc.Input(
                 id='user-input', 
                 type='text', 
@@ -89,6 +92,13 @@ class LastFmDashboard:
                 'boxShadow': '0 2px #999'
                 }
             ),
+            ],
+    style={
+        'display': 'flex',
+        'flexDirection': 'column',
+        'alignItems': 'center'
+    }
+),
             html.Div(id='top-albums-graph', style={
                 'border': '2px solid #663ac4', 
                 'padding': '20px', 
@@ -157,7 +167,7 @@ if __name__ == "__main__":
     api_key = os.getenv("API_KEY")
     dashboard = LastFmDashboard(api_key)
     dashboard.run()
-    dashboard.app.run_server(debug=True, host='0.0.0.0', port=os.getenv('PORT', 8050))
+    dashboard.app.run_server(debug=True, host='localhost', port=os.getenv('PORT', 8050))
 
 
 
