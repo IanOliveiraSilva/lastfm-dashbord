@@ -27,16 +27,13 @@ class LastFmDashboard:
     def layout(self):
         return html.Div([
             html.H1(
-                'Last.fm Collage', 
+                'Last.fm Dashbord', 
                 style={
                     'textAlign': 'center', 
                     'padding': '20px', 
                     'fontWeight':'bold',
-                    'backgroundColor': '#a16dfe', 
-                    'color': 'white', 
-                    'textShadow': '1px 1px 10px #000000',
+                    'color': 'black',
                     'borderRadius': '15px', 
-                    'boxShadow': '0px 0px 10px 3px rgba(2, 115, 94, 0.2)'
                 }
             ),
 
@@ -45,14 +42,14 @@ class LastFmDashboard:
                 type='text', 
                 placeholder='Enter Last.fm username', 
                 style={
-                    'width': '100%', 
-                    'height': '50px',
-                    'fontSize': '20px',
-                    'padding': '10px',
-                    'borderRadius': '15px',
-                    'border': '1px solid #7a4bd8',
-                    'outline': 'none',
-                    'boxShadow': '0px 0px 5px 1px #5229b1'
+                     'width': '50%', 
+                'height': '50px',
+                'fontSize': '20px',
+                'padding': '10px',
+                'borderRadius': '15px',
+                'border': '1px solid #7a4bd8',
+                'outline': 'none',
+                'boxShadow': '0px 0px 5px 1px #5229b1'
                 }
             ),
             html.Br(),
@@ -69,10 +66,9 @@ class LastFmDashboard:
                 placeholder='Period: ',
                 value='7day',
                 style={
-                    'width': '100%', 
-                    'fontSize': '20px',
-                    'borderRadius': '15px',
-                    'border': '1px solid #5229b1',
+                    'width': '50%', 
+                'fontSize': '20px',
+                'borderRadius': '15px',
                 }
             ),
             html.Br(),
@@ -80,17 +76,17 @@ class LastFmDashboard:
                 'Submit', 
                 id='submit-button', 
                 style={
-                    'width': '100%', 
-                    'backgroundColor': '#a16dfe', 
-                    'fontSize': '20px', 
-                    'color': 'white', 
-                    'border': 'none', 
-                    'padding': '1px', 
-                    'textDecoration': 'none', 
-                    'margin': '4px 2px', 
-                    'cursor': 'pointer', 
-                    'borderRadius': '12px', 
-                    'boxShadow': '0 2px #999'
+                   'width': '50%', 
+                'backgroundColor': '#a16dfe', 
+                'fontSize': '20px', 
+                'color': 'white', 
+                'border': 'none', 
+                'padding': '1px', 
+                'textDecoration': 'none', 
+                'margin': '4px 2px', 
+                'cursor': 'pointer', 
+                'borderRadius': '12px', 
+                'boxShadow': '0 2px #999'
                 }
             ),
             html.Div(id='top-albums-graph', style={
