@@ -46,7 +46,7 @@ Dash: Biblioteca utilizada para criar componentes interativos na web.
 ## Autor
 
 - [@IanOliveiraSilva](https://github.com/IanOliveiraSilva)
-- 
+
 ## Feedback
 
 Se você tiver algum feedback, entre em contato comigo pelo e-mail ianoliveira.tec@gmail.com
