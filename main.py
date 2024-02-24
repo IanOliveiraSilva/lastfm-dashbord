@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 
 from wordcloud import WordCloud
 
+import textwrap
+
 import collections
 
 
@@ -145,7 +147,21 @@ class LastFmDashboard:
                 'border': '2px solid #663ac4', 
                 'padding': '20px', 
                 'margin': '20px', 
-                'fontSize': '25px',
+                'borderRadius': '15px',
+
+            }),
+            html.Div(id='sunburst-graph', style={
+                'border': '2px solid #663ac4', 
+                'padding': '20px', 
+                'margin': '20px', 
+                'borderRadius': '15px',
+                'fontWeight':'bold',
+
+            }),
+            html.Div(id='recent-track-bar-graph', style={
+                'border': '2px solid #663ac4', 
+                'padding': '20px', 
+                'margin': '20px', 
                 'borderRadius': '15px',
 
             }),
@@ -187,7 +203,19 @@ class LastFmDashboard:
             names.append(item["name"])
             playcounts.append(int(item["playcount"]))
 
-        return go.Bar(x=names, y=playcounts, marker_color='rgb(82,41,177)')
+        return go.Bar(
+            x=names, 
+            y=playcounts, 
+            marker_color='rgb(82,41,177)',  # original color
+            text=playcounts,  # this will display playcounts at the top of the bar
+            textposition='outside',  # this will ensure that the playcounts are displayed outside
+            hovertemplate="<b>%{x}</b><br><br>%{y} plays",  # custom hovertemplate
+            marker=dict(
+                line=dict(color='rgb(0,0,0)', width=1.5),  # adding a border to the bar
+            ),
+            opacity=0.7,  # making the bar slightly translucent
+        )
+
     
     def plot_data_pie(self, data, key):
         names = []
@@ -199,7 +227,26 @@ class LastFmDashboard:
 
         name = ", ".join(names)
 
-        return go.Pie(labels=names, values=playcounts, name=name, hole=.3, textinfo='label')
+        return go.Pie(
+            labels=names, 
+            values=playcounts, 
+            name=name, 
+            hole=.3, 
+            textinfo='label', 
+            textposition='inside', 
+            insidetextorientation='radial', 
+            textfont=dict(size=18),
+            marker=dict(
+                colors=['#FEBFB3', '#E1396C', '#96D38C', '#D0F9B1'],
+                line=dict(color='#000000', width=2)
+            ),
+            hoverinfo='label+percent',
+            hoverlabel=dict(
+                bgcolor='black',
+                font=dict(color='white', size=16)
+            )
+        )
+
 
     def plot_wordcloud(self, data, key):
         names = [item["name"] for item in data[f"top{key}s"][key]]
@@ -213,26 +260,91 @@ class LastFmDashboard:
     def plot_data_tree(self, data):
         labels = []
         parents = []
+        artist_count = 0
+        colors = ['#FFADAD', '#FFD6A5', '#FDFFB6', '#CAFFBF'] 
+
+        color_dict = {}
 
         for track in data["recenttracks"]["track"]:
-            artist = "Artista: " + track["artist"]["#text"]
-            album = "Álbum: " + track["album"]["#text"]
-            track_name = "Música: " + track["name"]
+            artist = track["artist"]["#text"]
+            album = " " + track["album"]["#text"]
+            track_name = "" + track["name"]
 
             if artist not in labels:
+                if artist_count >= 4:
+                    continue
                 labels.append(artist)
                 parents.append("")
+                color_dict[artist] = colors[artist_count]
+                artist_count += 1
 
-            if album not in labels:
+            if album not in labels and artist in labels:
                 labels.append(album)
                 parents.append(artist)
 
-            labels.append(track_name)
-            parents.append(album)
+            if album in labels:
+                labels.append(track_name)
+                parents.append(album)
+
+        marker_colors = [color_dict.get(label, '#FFFFFF') for label in labels]
 
         return go.Treemap(
             labels=labels,
-            parents=parents
+            parents=parents,
+            textfont=dict(size=23, color='black'),
+            marker=dict(
+                colors=marker_colors,
+                line=dict(width=1, color='white')
+            ),
+            tiling=dict(
+                pad=5
+            )
+        )
+
+    def plot_data_sunburst(self, data):
+        labels = []
+        parents = []
+        artist_count = 0
+        colors = ['#3b234a', '#523961', '#baafc4', '#c3bbc9']
+        color_dict = {}
+
+        for track in data["recenttracks"]["track"]:
+            artist = textwrap.fill(track["artist"]["#text"], 30)
+            album = " " + textwrap.fill(track["album"]["#text"], 30)
+            track_name = "" + textwrap.fill(track["name"], 30)
+
+            if artist not in labels:
+                if artist_count >= 4:
+                    continue
+                labels.append(artist)
+                parents.append("")
+                color_dict[artist] = colors[artist_count]
+                artist_count += 1
+
+            if album not in labels and artist in labels:
+                labels.append(album)
+                parents.append(artist)
+                color_dict[album] = color_dict[artist]
+
+            if album in labels:
+                labels.append(track_name)
+                parents.append(album)
+                color_dict[track_name] = color_dict[artist]
+
+        marker_colors = [color_dict[label] for label in labels]
+
+        return go.Sunburst(
+            labels=labels,
+            parents=parents,
+            textfont=dict(size=25, color='white'),
+            marker=dict(
+                colors=marker_colors,
+                line=dict(width=3, color='black')
+            ),
+            leaf=dict(opacity=0.9),
+            branchvalues='total',
+            hoverinfo='label+percent parent',
+            maxdepth=2 
         )
 
     def plot_data_bubble(self, data, key):
@@ -243,6 +355,10 @@ class LastFmDashboard:
             names.append(item["name"])
             playcounts.append(int(item["playcount"]))
 
+
+        colors = ['#F4D03F', '#F5B041', '#DC7633', '#6E2C00']
+        color_scale = [colors[i % len(colors)] for i in range(len(names))]
+
         return go.Scatter(
             x=names,
             y=[key]*len(names),
@@ -251,79 +367,76 @@ class LastFmDashboard:
                 size=playcounts,
                 sizemode='area',
                 sizeref=2.*max(playcounts)/(40.**2),
-                sizemin=4
+                sizemin=4,
+                color=color_scale,
+                line=dict(width=2, color='DarkSlateGrey') 
             ),
-            text=names
+            text=names,
+            hoverinfo='text',
+            hoverlabel=dict( 
+                bgcolor='black',
+                font=dict(color='white', size=16)
+            )
         )
 
     def plot_network_graph(self, data):
         G = nx.Graph()
+        node_colors = []
 
         for track in data['recenttracks']['track']:
             artist_name = track['artist']['#text']
             album_name = track['album']['#text']
             track_name = track['name']
 
-            G.add_node(artist_name, type='artista')
-            G.add_node(album_name, type='album')
-            G.add_edge(artist_name, album_name)
+            if artist_name not in G:
+                G.add_node(artist_name, type='artista')
+                node_colors.append('rgba(255, 0, 0, 0.8)') 
 
-            G.add_node(track_name, type='musica')
-            G.add_edge(album_name, track_name)
+            if album_name not in G:
+                G.add_node(album_name, type='album')
+                G.add_edge(artist_name, album_name)
+                node_colors.append('rgba(0, 255, 0, 0.8)') 
+
+            if track_name not in G:
+                G.add_node(track_name, type='musica')
+                G.add_edge(album_name, track_name)
+                node_colors.append('rgba(0, 0, 255, 0.8)') 
 
         pos = nx.spring_layout(G, seed=42)
 
-        edge_x = []
-        edge_y = []
-        for edge in G.edges():
-            x0, y0 = pos[edge[0]]
-            x1, y1 = pos[edge[1]]
-            edge_x.extend([x0, x1, None])
-            edge_y.extend([y0, y1, None])
-
         edge_trace = go.Scatter(
-            x=edge_x, y=edge_y,
+            x=[], y=[],
             line=dict(width=0.5, color='#888'),
             hoverinfo='none',
             mode='lines')
 
-        node_x = []
-        node_y = []
-        node_text = []
-        for node in G.nodes():
-            x, y = pos[node]
-            node_x.append(x)
-            node_y.append(y)
-            node_text.append(f'{node} ({G.nodes[node]["type"]})')
+        for edge in G.edges():
+            x0, y0 = pos[edge[0]]
+            x1, y1 = pos[edge[1]]
+            edge_trace['x'] += tuple([x0, x1, None])
+            edge_trace['y'] += tuple([y0, y1, None])
 
         node_trace = go.Scatter(
-            x=node_x, y=node_y,
+            x=[], y=[],
+            text=[],
             mode='markers',
-            text=node_text,
             hoverinfo='text',
             marker=dict(
-                showscale=True,
-                colorscale='YlGnBu',
-                reversescale=True,
-                color=[],
+                showscale=False,
+                color=node_colors,
                 size=10,
-                colorbar=dict(
-                    thickness=15,
-                    title='Recent Tracks',
-                    xanchor='left',
-                    titleside='right'
-                ),
-                line_width=2))
+                line=dict(color='black', width=2)))
 
-        node_adjacencies = []
-        for node, adjacencies in enumerate(G.adjacency()):
-            node_adjacencies.append(len(adjacencies[1]))
-
-        node_trace.marker.color = node_adjacencies
+        for node in G.nodes():
+            x, y = pos[node]
+            node_trace['x'] += tuple([x])
+            node_trace['y'] += tuple([y])
+            node_trace['text'] += tuple([f'{node} ({G.nodes[node]["type"]})'])
 
         fig = go.Figure(data=[edge_trace, node_trace],
                         layout=go.Layout(
-                            titlefont_size=16,
+                            title='Network Graph of Recent Tracks',
+                            titlefont=dict(size=16),
                             showlegend=False,
                             hovermode='closest',
                             margin=dict(b=20,l=5,r=5,t=40),
@@ -332,10 +445,29 @@ class LastFmDashboard:
                         )
         return fig
 
-    def get_artist_genres(self, artist):
-        data = self.get_artist_data("artist.getinfo", artist)
-        genres = [tag['name'] for tag in data['artist']['tags']['tag']]
-        return genres
+    def plot_data_stacked_bar(self, data):
+        artists = []
+        albums = []
+        tracks = []
+
+        for track in data["recenttracks"]["track"]:
+            artist = track["artist"]["#text"]
+            album = track["album"]["#text"]
+            track_name = track["name"]
+
+            artists.append(artist)
+            albums.append(album)
+            tracks.append(track_name)
+
+        fig = go.Figure(data=[
+            go.Bar(name='Artists', x=list(set(artists)), y=[artists.count(artist) for artist in set(artists)]),
+            go.Bar(name='Albums', x=list(set(albums)), y=[albums.count(album) for album in set(albums)]),
+            go.Bar(name='Tracks', x=list(set(tracks)), y=[tracks.count(track) for track in set(tracks)])
+        ])
+
+        fig.update_layout(barmode='stack', xaxis={'categoryorder':'total descending'}, title_text='Music Data')
+        return fig
+
 
     def run(self):
         @self.app.callback(
@@ -345,6 +477,8 @@ class LastFmDashboard:
             Output('top-tracks-graph', 'children')],
             Output('top-track-bubble', 'children'),
             Output('top-track-pie', 'children'),
+            Output('sunburst-graph', 'children'),
+            Output('recent-track-bar-graph', 'children'),
             Output('tree-graph', 'children'),
             Output('network-graph', 'children'),
             [Input('submit-button', 'n_clicks')],
@@ -477,7 +611,16 @@ class LastFmDashboard:
                                 height=600,
                             )
                         }),
+                        dcc.Graph(figure={
+                            'data': [self.plot_data_sunburst(data)], 
+                            'layout': go.Layout(
+                                title=f'Top Played Tracks from {user} ({period})', 
+                                autosize=True, 
+                                height=600,
+                            )
+                        }),
                         dcc.Graph(figure=self.plot_network_graph(data)),
+                        dcc.Graph(figure=self.plot_data_stacked_bar(data)),
                         dcc.Graph(figure={
                             'data': [
                                 self.plot_data_bubble(data_albums, 'album'),
