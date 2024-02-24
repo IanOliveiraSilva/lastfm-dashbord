@@ -498,37 +498,40 @@ class LastFmDashboard:
                 self.plot_wordcloud(data_artists, 'artist')
 
                 return (
-                    html.Div([
-                        html.Div(
-                            html.A(user_info['user']['name'], 
-                                href=user_info['user']['url'],
-                                target='_blank',
-                                style={
-                                    'color': '#5a189a',
-                                    'textTransform': 'uppercase',
-                                    'fontSize': '24px',
-                                    'fontWeight': 'bold',
-                                    'padding': '10px',
-                                    'borderBottom': '2px solid #5a189a',
-                                    'marginBottom': '20px',
-                                }),
-                            style={'textAlign': 'center'}
-                        ),
-                        html.A(
-                            html.Img(src=user_info['user']['image'][-1]['#text'], style={
-                                'border': '2px solid #5a189a',
-                                'borderRadius': '15px',
-                                'boxShadow': '0px 10px 15px rgba(0, 0, 0, 0.1)',
-                                'display': 'block',
-                                'marginLeft': 'auto',
-                                'marginRight': 'auto'
-                            }),
+                   html.Div([
+                    html.Div(
+                        html.A(user_info['user']['name'], 
                             href=user_info['user']['url'],
-                            target='_blank'
-                        ),
+                            target='_blank',
+                            style={
+                                'color': '#5a189a',
+                                'textTransform': 'uppercase',
+                                'fontSize': '24px',
+                                'fontWeight': 'bold',
+                                'padding': '10px',
+                                'borderBottom': '2px solid #5a189a',
+                                'textShadow': '1px 1px 1px #ffffff',
+                            }),
+                        style={'textAlign': 'center'}
+                    ),
+                    html.Br(),
+                    html.A(
+                        html.Img(src=user_info['user']['image'][-1]['#text'], style={
+                            'border': '2px solid #5a189a',
+                            'borderRadius': '50%',
+                            'boxShadow': '0px 10px 15px rgba(0, 0, 0, 0.1)',
+                            'display': 'block',
+                            'marginLeft': 'auto',
+                            'marginRight': 'auto',
+                            'width': '200px',
+                            'height': '200px', 
+                        }),
+                        href=user_info['user']['url'],
+                        target='_blank'
+                    ),
 
-                        html.Br(),
-                      html.P(f"Playcount: {user_info['user']['playcount']}", style={
+                    html.Br(),
+                    html.P(f"Playcount: {user_info['user']['playcount']}", style={
                         'color': '#4d194d',
                         'fontSize': '18px',
                         'fontWeight': 'bold',
@@ -536,6 +539,7 @@ class LastFmDashboard:
                         'backgroundColor': '#f3e8ee',
                         'borderRadius': '10px',
                         'marginBottom': '10px',
+                        'textAlign': 'center', 
                     }),
                     html.P(f"Artist count: {user_info['user']['artist_count']}", style={
                         'color': '#4d194d',
@@ -545,6 +549,7 @@ class LastFmDashboard:
                         'backgroundColor': '#f3e8ee',
                         'borderRadius': '10px',
                         'marginBottom': '10px',
+                        'textAlign': 'center',
                     }),
                     html.P(f"Track count: {user_info['user']['track_count']}", style={
                         'color': '#4d194d',
@@ -554,6 +559,7 @@ class LastFmDashboard:
                         'backgroundColor': '#f3e8ee',
                         'borderRadius': '10px',
                         'marginBottom': '10px',
+                        'textAlign': 'center',
                     }),
                     html.P(f"Album count: {user_info['user']['album_count']}", style={
                         'color': '#4d194d',
@@ -563,7 +569,10 @@ class LastFmDashboard:
                         'backgroundColor': '#f3e8ee',
                         'borderRadius': '10px',
                         'marginBottom': '10px',
+                        'textAlign': 'center', 
                     }),
+
+
                     ]),
                         dcc.Graph(figure={
                         'data': [self.plot_data_tree(data)], 
@@ -606,7 +615,7 @@ class LastFmDashboard:
                         dcc.Graph(figure={
                             'data': [self.plot_data_pie(data_tracks, 'track')], 
                             'layout': go.Layout(
-                                title=f'Top Played Tracks from {user}', 
+                                title=f'Top Played Tracks from {user} ({period})', 
                                 autosize=True, 
                                 height=600,
                             )
