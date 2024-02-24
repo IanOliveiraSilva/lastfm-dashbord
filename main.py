@@ -545,7 +545,7 @@ class LastFmDashboard:
                     ),
 
                     html.Br(),
-                    html.P(f"Playcount: {user_info['user']['playcount']}", style={
+                    html.P(f"Playcount: {int(user_info['user']['playcount']):,}", style={
                         'color': '#4d194d',
                         'fontSize': '18px',
                         'fontWeight': 'bold',
@@ -555,7 +555,7 @@ class LastFmDashboard:
                         'marginBottom': '10px',
                         'textAlign': 'center', 
                     }),
-                    html.P(f"Artist count: {user_info['user']['artist_count']}", style={
+                    html.P(f"Artist count: {int(user_info['user']['artist_count']):,}", style={
                         'color': '#4d194d',
                         'fontSize': '18px',
                         'fontWeight': 'bold',
@@ -565,7 +565,7 @@ class LastFmDashboard:
                         'marginBottom': '10px',
                         'textAlign': 'center',
                     }),
-                    html.P(f"Track count: {user_info['user']['track_count']}", style={
+                    html.P(f"Track count: {int(user_info['user']['track_count']):,}", style={
                         'color': '#4d194d',
                         'fontSize': '18px',
                         'fontWeight': 'bold',
@@ -575,7 +575,7 @@ class LastFmDashboard:
                         'marginBottom': '10px',
                         'textAlign': 'center',
                     }),
-                    html.P(f"Album count: {user_info['user']['album_count']}", style={
+                    html.P(f"Album count: {int(user_info['user']['album_count']):,}", style={
                         'color': '#4d194d',
                         'fontSize': '18px',
                         'fontWeight': 'bold',
@@ -585,6 +585,7 @@ class LastFmDashboard:
                         'marginBottom': '10px',
                         'textAlign': 'center', 
                     }),
+
                     ]),
 
                     dcc.Graph(figure={
