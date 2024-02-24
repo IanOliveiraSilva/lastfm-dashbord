@@ -206,14 +206,14 @@ class LastFmDashboard:
         return go.Bar(
             x=names, 
             y=playcounts, 
-            marker_color='rgb(82,41,177)',  # original color
-            text=playcounts,  # this will display playcounts at the top of the bar
-            textposition='outside',  # this will ensure that the playcounts are displayed outside
-            hovertemplate="<b>%{x}</b><br><br>%{y} plays",  # custom hovertemplate
+            marker_color='rgb(82,41,177)',
+            text=playcounts,
+            textposition='outside',
+            hovertemplate="<b>%{x}</b><br><br>%{y} plays",
             marker=dict(
-                line=dict(color='rgb(0,0,0)', width=1.5),  # adding a border to the bar
+                line=dict(color='rgb(0,0,0)', width=1.5),  
             ),
-            opacity=0.7,  # making the bar slightly translucent
+            opacity=0.7,
         )
 
     
@@ -606,7 +606,7 @@ class LastFmDashboard:
                         dcc.Graph(figure={
                             'data': [self.plot_data_pie(data_tracks, 'track')], 
                             'layout': go.Layout(
-                                title=f'Top Played Tracks from {user} ({period})', 
+                                title=f'Top Played Tracks from {user}', 
                                 autosize=True, 
                                 height=600,
                             )
@@ -614,7 +614,7 @@ class LastFmDashboard:
                         dcc.Graph(figure={
                             'data': [self.plot_data_sunburst(data)], 
                             'layout': go.Layout(
-                                title=f'Top Played Tracks from {user} ({period})', 
+                                title=f'Recent Played Tracks from {user}', 
                                 autosize=True, 
                                 height=600,
                             )
@@ -628,7 +628,7 @@ class LastFmDashboard:
                                 self.plot_data_bubble(data_tracks, 'track')
                             ], 
                             'layout': go.Layout(
-                                title=f'Top Played Items from {user} ({period})', 
+                                title=f'Recent Played Items from {user}', 
                                 autosize=True, 
                                 height=600,
                                 showlegend=False,
