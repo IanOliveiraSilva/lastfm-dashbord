@@ -505,7 +505,7 @@ if __name__ == "__main__":
     api_key = os.getenv("API_KEY")
     dashboard = LastFmDashboard(api_key)
     dashboard.run()
-    dashboard.app.run_server(debug=True, host='localhost', port=os.getenv('PORT', 8050))
+    dashboard.app.run_server(debug=True, host='0.0.0.0', port=os.getenv('PORT', 8050))
 
 
 
