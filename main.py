@@ -9,13 +9,11 @@ import os
 from dotenv import load_dotenv
 
 import networkx as nx
-import matplotlib.pyplot as plt
 
 from wordcloud import WordCloud
 
 import textwrap
 
-import collections
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',
@@ -28,6 +26,7 @@ class LastFmDashboard:
         self.app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
         self.app.layout = self.layout()
 
+    ## PÁGINA HTML
     def layout(self):
         return html.Div([
             html.H1(
@@ -101,80 +100,93 @@ class LastFmDashboard:
         'alignItems': 'center'
     }
 ),
+
             html.Div(id='user-info', style={
-                'border': '2px solid #663ac4', 
                 'padding': '20px', 
                 'margin': '20px', 
                 'fontSize': '15px',
                 'borderRadius': '15px',
-            }),
-            html.Div(id='top-albums-graph', style={
-                'border': '2px solid #663ac4', 
-                'padding': '20px', 
-                'margin': '20px', 
-                'fontSize': '15px',
-                'borderRadius': '15px',
-            }),
-            html.Div(id='top-artists-graph', style={
-                'border': '2px solid #7a4bd8', 
-                'padding': '20px', 
-                'margin': '20px', 
-                'fontSize': '15px',
-                'borderRadius': '15px',
-            }),
-            html.Div(id='top-tracks-graph', style={
-                'border': '2px solid #663ac4', 
-                'padding': '20px', 
-                'margin': '20px', 
-                'fontSize': '15px',
-                'borderRadius': '15px',
-            }),         
-            html.Div(id='top-track-bubble', style={
-                'border': '2px solid #663ac4', 
-                'padding': '20px', 
-                'margin': '20px', 
-                'fontSize': '15px',
-                'borderRadius': '15px',
-            }),
-            html.Div(id='top-track-pie', style={
-                'border': '2px solid #663ac4', 
-                'padding': '20px', 
-                'margin': '20px', 
-                'fontSize': '15px',
-                'borderRadius': '15px',
-            }),
-            html.Div(id='tree-graph', style={
-                'border': '2px solid #663ac4', 
-                'padding': '20px', 
-                'margin': '20px', 
-                'borderRadius': '15px',
+            }), 
 
-            }),
-            html.Div(id='sunburst-graph', style={
-                'border': '2px solid #663ac4', 
-                'padding': '20px', 
-                'margin': '20px', 
-                'borderRadius': '15px',
-                'fontWeight':'bold',
 
-            }),
-            html.Div(id='recent-track-bar-graph', style={
+            html.Div([
+                html.Div(id='tree-graph', style={
+                    'padding': '20px', 
+                    'margin': '20px', 
+                }),
+                html.Div(id='sunburst-graph', style={
+                    'padding': '20px', 
+                    'margin': '20px', 
+                    'fontWeight':'bold',
+                }),
+                html.Div(id='recent-track-bar-graph', style={
+                    'padding': '20px', 
+                    'margin': '20px', 
+                    'fontWeight':'bold',
+                }),
+                html.Div(id='network-graph', style={
+                    'padding': '20px', 
+                    'margin': '20px', 
+                    'fontSize': '25px',
+                }),
+                html.Div(id='top-track-bubble', style={
+                    'padding': '20px', 
+                    'margin': '20px', 
+                    'fontSize': '15px',
+                }),     
+            ], style={
                 'border': '2px solid #663ac4', 
-                'padding': '20px', 
-                'margin': '20px', 
                 'borderRadius': '15px',
-
             }),
-            html.Div(id='network-graph', style={
+
+            html.Br(),
+
+            html.Div([
+                html.Div(id='top-albums-graph', style={
+                    'padding': '20px', 
+                    'margin': '20px', 
+                }),
+                html.Div(id='top-artists-graph', style={
+                    'padding': '20px', 
+                    'margin': '20px', 
+                    'fontSize': '15px',
+                }),
+                html.Div(id='top-tracks-graph', style={
+                    'padding': '20px', 
+                    'margin': '20px', 
+                    'fontSize': '15px',
+                }),     
+            ], style={
                 'border': '2px solid #663ac4', 
-                'padding': '20px', 
-                'margin': '20px', 
-                'fontSize': '25px',
                 'borderRadius': '15px',
-
-            }),
+            }),  
+            
+            html.Br(),
+            
+            html.Div([
+                html.Div(id='top-track-pie', style={
+                    'padding': '20px', 
+                    'margin': '20px', 
+                    'fontSize': '15px',
+                }),
+                html.Div(id='top-album-pie', style={
+                    'padding': '20px', 
+                    'margin': '20px', 
+                    'fontSize': '15px',
+                }),
+                html.Div(id='top-artist-pie', style={
+                    'padding': '20px', 
+                    'margin': '20px', 
+                    'fontSize': '15px',
+                }),     
+            ], style={
+                'border': '2px solid #663ac4', 
+                'borderRadius': '15px',
+            })
+   
         ], style={'width': '100%', 'margin': 'auto'})
 
+    ## REQUESTS API
     def get_json_data(self, method, user, period):
         url = f"http://ws.audioscrobbler.com/2.0/?method={method}&user={user}&api_key={self.api_key}&period={period}&format=json"
         response = requests.get(url)
@@ -195,6 +207,7 @@ class LastFmDashboard:
         response = requests.get(url)
         return response.json()
     
+    ## GRÁFICOS
     def plot_data(self, data, key):
         names = []
         playcounts = []
@@ -216,7 +229,6 @@ class LastFmDashboard:
             opacity=0.7,
         )
 
-    
     def plot_data_pie(self, data, key):
         names = []
         playcounts = []
@@ -247,7 +259,6 @@ class LastFmDashboard:
             )
         )
 
-
     def plot_wordcloud(self, data, key):
         names = [item["name"] for item in data[f"top{key}s"][key]]
 
@@ -261,7 +272,7 @@ class LastFmDashboard:
         labels = []
         parents = []
         artist_count = 0
-        colors = ['#FFADAD', '#FFD6A5', '#FDFFB6', '#CAFFBF'] 
+        colors = ['#FFADAD', '#FFD6A5', '#FDFFB6', '#CAFFBF', '#9BF6FF', '#A0C4FF', '#BDB2FF', '#FFC6FF'] 
 
         color_dict = {}
 
@@ -271,8 +282,8 @@ class LastFmDashboard:
             track_name = "" + track["name"]
 
             if artist not in labels:
-                if artist_count >= 4:
-                    continue
+                if artist_count >= 5:  # limit to 4 artists
+                    break
                 labels.append(artist)
                 parents.append("")
                 color_dict[artist] = colors[artist_count]
@@ -294,7 +305,7 @@ class LastFmDashboard:
             textfont=dict(size=23, color='black'),
             marker=dict(
                 colors=marker_colors,
-                line=dict(width=1, color='white')
+                line=dict(width=1.5, color='black')
             ),
             tiling=dict(
                 pad=5
@@ -305,7 +316,7 @@ class LastFmDashboard:
         labels = []
         parents = []
         artist_count = 0
-        colors = ['#3b234a', '#523961', '#baafc4', '#c3bbc9']
+        colors = ['#3b234a', '#523961', '#baafc4', '#c3bbc9', '#dcd6f7']
         color_dict = {}
 
         for track in data["recenttracks"]["track"]:
@@ -314,7 +325,7 @@ class LastFmDashboard:
             track_name = "" + textwrap.fill(track["name"], 30)
 
             if artist not in labels:
-                if artist_count >= 4:
+                if artist_count >= 5:
                     continue
                 labels.append(artist)
                 parents.append("")
@@ -443,6 +454,7 @@ class LastFmDashboard:
                             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
                             yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
                         )
+        
         return fig
 
     def plot_data_stacked_bar(self, data):
@@ -468,19 +480,20 @@ class LastFmDashboard:
         fig.update_layout(barmode='stack', xaxis={'categoryorder':'total descending'}, title_text='Music Data')
         return fig
 
-
     def run(self):
         @self.app.callback(
             [Output('user-info', 'children'),
+            Output('tree-graph', 'children'),
+            Output('sunburst-graph', 'children'),
+            Output('recent-track-bar-graph', 'children'),
+            Output('network-graph', 'children'),
+            Output('top-track-bubble', 'children'),
             Output('top-albums-graph', 'children'),
             Output('top-artists-graph', 'children'),
             Output('top-tracks-graph', 'children')],
-            Output('top-track-bubble', 'children'),
             Output('top-track-pie', 'children'),
-            Output('sunburst-graph', 'children'),
-            Output('recent-track-bar-graph', 'children'),
-            Output('tree-graph', 'children'),
-            Output('network-graph', 'children'),
+            Output('top-artist-pie', 'children'),
+            Output('top-album-pie', 'children'),
             [Input('submit-button', 'n_clicks')],
             [dash.dependencies.State('user-input', 'value'),
             dash.dependencies.State('period-input', 'value')]
@@ -498,7 +511,8 @@ class LastFmDashboard:
                 self.plot_wordcloud(data_artists, 'artist')
 
                 return (
-                   html.Div([
+                    html.Div([
+                       
                     html.Div(
                         html.A(user_info['user']['name'], 
                             href=user_info['user']['url'],
@@ -571,86 +585,111 @@ class LastFmDashboard:
                         'marginBottom': '10px',
                         'textAlign': 'center', 
                     }),
-
-
                     ]),
-                        dcc.Graph(figure={
-                        'data': [self.plot_data_tree(data)], 
+
+                    dcc.Graph(figure={
+                    'data': [self.plot_data_tree(data)], 
+                    'layout': go.Layout(
+                        title=f'Tree Map of Recent Tracks from {user}', 
+                        autosize=True, 
+                        height=600
+                    )
+                }),
+
+                    dcc.Graph(figure={
+                        'data': [self.plot_data_sunburst(data)], 
                         'layout': go.Layout(
-                            title=f'Tree Map of Recent Tracks from {user}', 
+                            title=f'Recent Played Tracks from {user}', 
                             autosize=True, 
-                            height=600
+                            height=600,
+                        )
+                    }),    
+                    
+                    dcc.Graph(figure=self.plot_data_stacked_bar(data)),
+
+                    dcc.Graph(figure=self.plot_network_graph(data)),
+
+                    dcc.Graph(figure={
+                        'data': [
+                            self.plot_data_bubble(data_albums, 'album'),
+                            self.plot_data_bubble(data_artists, 'artist'),
+                            self.plot_data_bubble(data_tracks, 'track')
+                        ], 
+                        'layout': go.Layout(
+                            title=f'Recent Played Items from {user}', 
+                            autosize=True, 
+                            height=600,
+                            showlegend=False,
+                            yaxis=dict(
+                                title='Type',
+                                tickmode='array',
+                                tickvals=['album', 'artist', 'track'],
+                                ticktext=['Albums', 'Artists', 'Tracks']
+                            ),
+                            xaxis=dict(tickangle=-45, automargin=True, title='Items')
                         )
                     }),
-                        dcc.Graph(figure={
-                                'data': [self.plot_data(data_albums, 'album')], 
-                                'layout': go.Layout(
-                                    title=f'Top Played Albums from {user} ({period})', 
-                                    yaxis=dict(title='Playcount', automargin=True), 
-                                    autosize=True, 
-                                    height=600, 
-                                    xaxis=dict(tickangle=-45, automargin=True)
-                                )
-                            }),
-                        dcc.Graph(figure={
-                                'data': [self.plot_data(data_artists, 'artist')], 
-                                'layout': go.Layout(
-                                    title=f'Top Played Artists from {user} ({period})', 
-                                    yaxis=dict(title='Playcount', automargin=True), 
-                                    autosize=True, 
-                                    height=600, 
-                                    xaxis=dict(tickangle=-45, automargin=True)
-                                )
-                            }),
-                        dcc.Graph(figure={
-                                'data': [self.plot_data(data_tracks, 'track')], 
-                                'layout': go.Layout(
-                                    title=f'Top Played Tracks from {user} ({period})', 
-                                    yaxis=dict(title='Playcount', automargin=True), 
-                                    autosize=True, 
-                                    height=600, 
-                                    xaxis=dict(tickangle=-45, automargin=True)
-                                )
-                            }),
-                        dcc.Graph(figure={
-                            'data': [self.plot_data_pie(data_tracks, 'track')], 
+
+                     dcc.Graph(figure={
+                            'data': [self.plot_data(data_albums, 'album')], 
+                            'layout': go.Layout(
+                                title=f'Top Played Albums from {user} ({period})', 
+                                yaxis=dict(title='Playcount', automargin=True), 
+                                autosize=True, 
+                                height=600, 
+                                xaxis=dict(tickangle=-45, automargin=True)
+                            )
+                    }),
+
+                    dcc.Graph(figure={
+                            'data': [self.plot_data(data_artists, 'artist')], 
+                            'layout': go.Layout(
+                                title=f'Top Played Artists from {user} ({period})', 
+                                yaxis=dict(title='Playcount', automargin=True), 
+                                autosize=True, 
+                                height=600, 
+                                xaxis=dict(tickangle=-45, automargin=True)
+                            )
+                    }),
+
+                    dcc.Graph(figure={
+                            'data': [self.plot_data(data_tracks, 'track')], 
                             'layout': go.Layout(
                                 title=f'Top Played Tracks from {user} ({period})', 
+                                yaxis=dict(title='Playcount', automargin=True), 
                                 autosize=True, 
-                                height=600,
+                                height=600, 
+                                xaxis=dict(tickangle=-45, automargin=True)
                             )
-                        }),
-                        dcc.Graph(figure={
-                            'data': [self.plot_data_sunburst(data)], 
-                            'layout': go.Layout(
-                                title=f'Recent Played Tracks from {user}', 
-                                autosize=True, 
-                                height=600,
-                            )
-                        }),
-                        dcc.Graph(figure=self.plot_network_graph(data)),
-                        dcc.Graph(figure=self.plot_data_stacked_bar(data)),
-                        dcc.Graph(figure={
-                            'data': [
-                                self.plot_data_bubble(data_albums, 'album'),
-                                self.plot_data_bubble(data_artists, 'artist'),
-                                self.plot_data_bubble(data_tracks, 'track')
-                            ], 
-                            'layout': go.Layout(
-                                title=f'Recent Played Items from {user}', 
-                                autosize=True, 
-                                height=600,
-                                showlegend=False,
-                                yaxis=dict(
-                                    title='Type',
-                                    tickmode='array',
-                                    tickvals=['album', 'artist', 'track'],
-                                    ticktext=['Albums', 'Artists', 'Tracks']
-                                ),
-                                xaxis=dict(tickangle=-45, automargin=True, title='Items')
-                            )
-                        }),
+                    }),
+                        
+                    dcc.Graph(figure={
+                        'data': [self.plot_data_pie(data_tracks, 'track')], 
+                        'layout': go.Layout(
+                            title=f'Top Played Tracks from {user} ({period})', 
+                            autosize=True, 
+                            height=600,
                         )
+                    }),
+                    
+                    dcc.Graph(figure={
+                        'data': [self.plot_data_pie(data_albums, 'album')], 
+                        'layout': go.Layout(
+                            title=f'Top Played Album from {user} ({period})', 
+                            autosize=True, 
+                            height=600,
+                        )
+                    }),
+                    
+                    dcc.Graph(figure={
+                        'data': [self.plot_data_pie(data_artists, 'artist')], 
+                        'layout': go.Layout(
+                            title=f'Top Played Artists from {user} ({period})', 
+                            autosize=True, 
+                            height=600,
+                        )
+                    }),
+                    )
 
 if __name__ == "__main__":
     load_dotenv()
