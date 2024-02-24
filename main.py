@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 
 from wordcloud import WordCloud
 
+import collections
+
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',
                         'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css',
@@ -40,7 +42,6 @@ class LastFmDashboard:
             children=[
             dcc.Input(
                 id='user-input', 
-                value='SrVesper',
                 type='text', 
                 placeholder='Enter Last.fm username', 
                 style={
@@ -160,6 +161,11 @@ class LastFmDashboard:
 
     def get_json_data(self, method, user, period):
         url = f"http://ws.audioscrobbler.com/2.0/?method={method}&user={user}&api_key={self.api_key}&period={period}&format=json"
+        response = requests.get(url)
+        return response.json()
+    
+    def get_artist_data(self, method, artist):
+        url = f"http://ws.audioscrobbler.com/2.0/?method={method}&artist={artist}&api_key={self.api_key}&format=json"
         response = requests.get(url)
         return response.json()
     
@@ -325,6 +331,11 @@ class LastFmDashboard:
                             yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
                         )
         return fig
+
+    def get_artist_genres(self, artist):
+        data = self.get_artist_data("artist.getinfo", artist)
+        genres = [tag['name'] for tag in data['artist']['tags']['tag']]
+        return genres
 
     def run(self):
         @self.app.callback(
